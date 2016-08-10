@@ -9,7 +9,9 @@ import serial
 import matplotlib.pyplot as plt
 
 
-
+delay_ms = 20 # sample rate 50 Hz
+update_ms = 1000 # update period = 1 s
+plot_ms = 5000 # refresh period = 5 s
 connected = False
 locations = ['/dev/tty.usbmodem1421','/dev/tty.usbmodem1411','/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','dev/tty.usbserial','/dev/cu.usbmodem1421']
 
@@ -41,6 +43,7 @@ lny, = plt.plot(time, data[1], 'g-')
 lnz, = plt.plot(time, data[2], 'b-')
 lnt, = plt.plot(time, data[3], 'k-')
 fig.show()
+max_range = 300.0
 
 while 1:
     if ser.inWaiting():
@@ -57,14 +60,14 @@ while 1:
                 data[1].append(float(ny))
                 data[2].append(float(nz))
                 data[3].append(float(nt))
-                
+                max_range = max(max_range, abs(float(nt)))
             except ValueError:
                 pass
             s = ""
             idx += 1
         outfile.flush()
 
-        if idx % 20 == 0:
+        if idx % (update_ms / delay_ms) == 0: # 0.5s update
             lnx.set_xdata(time)
             lnx.set_ydata(data[0])
             lny.set_xdata(time)
@@ -73,11 +76,11 @@ while 1:
             lnz.set_ydata(data[2])
             lnt.set_xdata(time)
             lnt.set_ydata(data[3])
-            plt.axis([time[0], time[0] + 6000, -300, 300])
+            plt.axis([time[0], time[0] + plot_ms, -max_range, max_range])
             plt.draw()
             plt.pause(0.005)
 
-        if idx % 60 == 0:
+        if idx % (plot_ms / delay_ms) == 0: # 5s refresh
             fig = plt.clf()
             time = []
             data = [[],[],[],[]]
@@ -86,6 +89,7 @@ while 1:
             lnz, = plt.plot(time, data[2], 'b-')
             lnt, = plt.plot(time, data[3], 'k-')
             idx = 1
+            max_range = 300.0
 
 ## close the serial connection and text file
 outfile.close()

@@ -32,7 +32,7 @@ void setup()
 
 void loop()
 {
-  print_values(delay_ms, t);
+  print_values(t);
   delay(delay_ms);
   t += delay_ms; // max 2,147,483,647 ms
   digitalWrite(RXLED, HIGH);
@@ -86,7 +86,7 @@ void adjust(void) {
 }
 
 
-void print_values(int delay_ms, long t)
+void print_values(long t)
 {
   Serial.print(t);
   Serial.print(" ");
