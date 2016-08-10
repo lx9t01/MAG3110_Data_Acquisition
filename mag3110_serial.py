@@ -32,18 +32,19 @@ outfile = open("result.txt", 'w');
 ############### record plot ###############
 time = []
 data = [[],[],[],[]]
-lines = ['r-','g-','b-','k-']
 s = ""
-idx = 1
 
 plt.ioff()
 fig = plt.figure(num=1)
-lnx, = plt.plot(time, data[0], 'r-')
-lny, = plt.plot(time, data[1], 'g-')
-lnz, = plt.plot(time, data[2], 'b-')
-lnt, = plt.plot(time, data[3], 'k-')
+lnx, = plt.plot(time, data[0], 'r-', label='x')
+lny, = plt.plot(time, data[1], 'g-', label='y')
+lnz, = plt.plot(time, data[2], 'b-', label='z')
+lnt, = plt.plot(time, data[3], 'k-', label='intensity')
 fig.show()
+plt.xlabel('time (ms)')
+plt.ylabel('magnet field intendity (micro Tesla)')
 max_range = 300.0
+idx = 1
 
 while 1:
     if ser.inWaiting():
@@ -84,10 +85,12 @@ while 1:
             fig = plt.clf()
             time = []
             data = [[],[],[],[]]
-            lnx, = plt.plot(time, data[0], 'r-')
-            lny, = plt.plot(time, data[1], 'g-')
-            lnz, = plt.plot(time, data[2], 'b-')
-            lnt, = plt.plot(time, data[3], 'k-')
+            lnx, = plt.plot(time, data[0], 'r-', label='x')
+            lny, = plt.plot(time, data[1], 'g-', label='y')
+            lnz, = plt.plot(time, data[2], 'b-', label='z')
+            lnt, = plt.plot(time, data[3], 'k-', label='intensity')
+            plt.xlabel('time (ms)')
+            plt.ylabel('magnet field intendity (micro Tesla)')
             idx = 1
             max_range = 300.0
 
