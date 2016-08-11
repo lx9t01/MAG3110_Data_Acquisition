@@ -43,57 +43,62 @@ lnt, = plt.plot(time, data[3], 'k-', label='intensity')
 fig.show()
 plt.xlabel('time (ms)')
 plt.ylabel('magnet field intendity (micro Tesla)')
+plt.grid()
 max_range = 300.0
 idx = 1
 
 while 1:
-    if ser.inWaiting():
-        x=ser.read()
-        outfile.write(x)
-        s = s + x
-        if x=="\n":
-            print s
-            try:
-                [t, nx, ny, nz, nt] = s.split(' ')
-                # print(t+" "+nx+" "+ny+" "+nz+" "+nt)
-                time.append(int(t))
-                data[0].append(float(nx))
-                data[1].append(float(ny))
-                data[2].append(float(nz))
-                data[3].append(float(nt))
-                max_range = max(max_range, abs(float(nt)))
-            except ValueError:
-                pass
-            s = ""
-            idx += 1
-        outfile.flush()
+    #try:
+        if ser.inWaiting():
+            x=ser.read()
+            outfile.write(x)
+            s = s + x
+            if x=="\n":
+                print s
+                try:
+                    [t, nx, ny, nz, nt] = s.split(' ')
+                    # print(t+" "+nx+" "+ny+" "+nz+" "+nt)
+                    time.append(int(t))
+                    data[0].append(float(nx))
+                    data[1].append(float(ny))
+                    data[2].append(float(nz))
+                    data[3].append(float(nt))
+                    max_range = max(max_range, abs(float(nt)))
+                except ValueError:
+                    pass
+                s = ""
+                idx += 1
+            outfile.flush()
 
-        if idx % (update_ms / delay_ms) == 0: # 0.5s update
-            lnx.set_xdata(time)
-            lnx.set_ydata(data[0])
-            lny.set_xdata(time)
-            lny.set_ydata(data[1])
-            lnz.set_xdata(time)
-            lnz.set_ydata(data[2])
-            lnt.set_xdata(time)
-            lnt.set_ydata(data[3])
-            plt.axis([time[0], time[0] + plot_ms, -max_range, max_range])
-            plt.draw()
-            plt.pause(0.005)
+            if idx % (update_ms / delay_ms) == 0: # 0.5s update
+                lnx.set_xdata(time)
+                lnx.set_ydata(data[0])
+                lny.set_xdata(time)
+                lny.set_ydata(data[1])
+                lnz.set_xdata(time)
+                lnz.set_ydata(data[2])
+                lnt.set_xdata(time)
+                lnt.set_ydata(data[3])
+                plt.axis([time[0], time[0] + plot_ms, -max_range, max_range])
+                plt.draw()
+                plt.pause(0.005)
 
-        if idx % (plot_ms / delay_ms) == 0: # 5s refresh
-            fig = plt.clf()
-            time = []
-            data = [[],[],[],[]]
-            lnx, = plt.plot(time, data[0], 'r-', label='x')
-            lny, = plt.plot(time, data[1], 'g-', label='y')
-            lnz, = plt.plot(time, data[2], 'b-', label='z')
-            lnt, = plt.plot(time, data[3], 'k-', label='intensity')
-            plt.xlabel('time (ms)')
-            plt.ylabel('magnet field intendity (micro Tesla)')
-            idx = 1
-            max_range = 300.0
+            if idx % (plot_ms / delay_ms) == 0: # 5s refresh
+                fig = plt.clf()
+                time = []
+                data = [[],[],[],[]]
+                lnx, = plt.plot(time, data[0], 'r-', label='x')
+                lny, = plt.plot(time, data[1], 'g-', label='y')
+                lnz, = plt.plot(time, data[2], 'b-', label='z')
+                lnt, = plt.plot(time, data[3], 'k-', label='intensity')
+                plt.xlabel('time (ms)')
+                plt.ylabel('magnet field intendity (micro Tesla)')
+                plt.grid()
+                idx = 1
+                max_range = 300.0
+    #except IOError:
+        #print "unplugged!"
+        ## close the serial connection and text file
+        #outfile.close()
+        #ser.close()
 
-## close the serial connection and text file
-outfile.close()
-ser.close()
